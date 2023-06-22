@@ -1,7 +1,9 @@
 # ChatGptLib
 Just another OpenAI client library (chat completion only) with new functions feature support. For .NET 7.
 
-Simple usage example.
+Full documentation: https://clusterm.github.io/chatgptlib/
+
+## Simple usage example
 ```C#
 internal class Program
 {
