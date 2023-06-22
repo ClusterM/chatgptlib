@@ -12,8 +12,8 @@ namespace GhatGptTests
         const string OpenAIKey = "<insert your OpenAI API key here>";
         const string YouTubeApiKey = "<insert your YouTube API key here>";
 
-        const string RequestText = "How much o'clock? Also, can you say the current date? And day of the week.";
-        //const string RequestText = "Please find Rick Roll video on YouTube and give me the link to the largest preview image.";
+        //const string RequestText = "How much o'clock? Also, can you say the current date? And day of the week.";
+        const string RequestText = "Please find Rick Roll video on YouTube and give me the link to the largest preview image.";
         //const string RequestText = "Please find the most popular video on YouTube.";        
 
         static async Task Main(string[] args)
@@ -116,6 +116,7 @@ namespace GhatGptTests
                 }
                 else
                 {
+                    // Text answer received, done.
                     break;
                 }
             }
