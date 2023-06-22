@@ -53,9 +53,16 @@ namespace wtf.cluster.ChatGptLib.Types
     /// </summary>
     public class ChatGptErrorContainer
     {
+        /// <summary>
+        /// ChatError object.
+        /// </summary>
         [JsonPropertyName("error")]
         public ChatError? Error { get; init; }
 
+        /// <summary>
+        /// The constructor for internal usage.
+        /// </summary>
+        /// <param name="error">ChatError object.</param>
         [JsonConstructor]
         public ChatGptErrorContainer(ChatError? error)
         {

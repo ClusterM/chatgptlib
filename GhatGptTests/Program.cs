@@ -84,7 +84,7 @@ namespace GhatGptTests
                 // Process stream data
                 await foreach (var p in completionResultStream)
                 {
-                    // Append received data to response object
+                    // You can just use + operator to combine stream chunks
                     completionResult = completionResult! + p;
                     // Skip if it's function call
                     if (completionResult?.Choices?.First()?.Message?.FunctionCall != null)

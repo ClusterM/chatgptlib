@@ -43,7 +43,9 @@ namespace wtf.cluster.ChatGptLib.Types
         [JsonPropertyName("usage")]
         public ChatUsage? Usage { get; internal set; }
 
-        // Create empty ChatResponse object
+        /// <summary>
+        /// Constructor of empty ChatResponse object.
+        /// </summary>
         public ChatResponse() { }
 
         /// <summary>
@@ -66,6 +68,12 @@ namespace wtf.cluster.ChatGptLib.Types
             Usage = usage;
         }
 
+        /// <summary>
+        /// + operator
+        /// </summary>
+        /// <param name="a">First ChatResponse object.</param>
+        /// <param name="b">Second ChatResponse object.</param>
+        /// <returns>Combined ChatResponse object.</returns>
         public static ChatResponse operator +(ChatResponse a, ChatResponse b)
         {
             var n = new ChatResponse()
@@ -93,6 +101,10 @@ namespace wtf.cluster.ChatGptLib.Types
             return n;
         }
 
+        /// <summary>
+        /// ChatResponse string representation.
+        /// </summary>
+        /// <returns>ChatResponse string representation.</returns>
         public override string ToString() => Choices?.FirstOrDefault()?.ToString() ?? string.Empty;
     }
 }

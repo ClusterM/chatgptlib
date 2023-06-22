@@ -56,6 +56,13 @@ namespace wtf.cluster.ChatGptLib.Types
             FinishReason = finishReason;
         }
 
+        /// <summary>
+        /// + operator
+        /// </summary>
+        /// <param name="a">First ChatChoice.</param>
+        /// <param name="b">Second ChatChoice.</param>
+        /// <returns>Combined ChatChoice object.</returns>
+        /// <exception cref="InvalidOperationException"></exception>
         public static ChatChoice operator +(ChatChoice a, ChatChoice b)
         {
             if (a.Index != b.Index) 
@@ -76,6 +83,10 @@ namespace wtf.cluster.ChatGptLib.Types
             return n;
         }
 
+        /// <summary>
+        /// ChatChoice string representation.
+        /// </summary>
+        /// <returns>ChatChoice string representation.</returns>
         public override string ToString() => Message?.ToString() ?? string.Empty;
     }
 }

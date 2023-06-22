@@ -32,6 +32,12 @@ namespace wtf.cluster.ChatGptLib.Types
             Arguments = arguments;
         }
 
+        /// <summary>
+        /// + operator
+        /// </summary>
+        /// <param name="a">First ChatFunctionCallRequest object.</param>
+        /// <param name="b">Second ChatFunctionCallRequest object.</param>
+        /// <returns>Combined ChatFunctionCallRequest object.</returns>
         public static ChatFunctionCallRequest operator +(ChatFunctionCallRequest a, ChatFunctionCallRequest b)
         {
             var n = new ChatFunctionCallRequest(
@@ -41,6 +47,10 @@ namespace wtf.cluster.ChatGptLib.Types
             return n;
         }
 
+        /// <summary>
+        /// ChatFunctionCallRequest string representation.
+        /// </summary>
+        /// <returns>ChatFunctionCallRequest string representation.</returns>
         public override string ToString() => $"{Name} - {Arguments}";
     }
 }

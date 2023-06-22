@@ -7,7 +7,27 @@ namespace wtf.cluster.ChatGptLib.Types
     /// </summary>
     public class ChatMessage
     {
-        public enum ChatMessageRole { System, User, Assistant, Function };
+        /// <summary>
+        /// Message role.
+        /// </summary>
+        public enum ChatMessageRole { 
+            /// <summary>
+            /// System message (main rules).
+            /// </summary>
+            System,
+            /// <summary>
+            /// Message from user (request from the user).
+            /// </summary>
+            User,
+            /// <summary>
+            /// Assistant message (reply from the assistant).
+            /// </summary>
+            Assistant,
+            /// <summary>
+            /// Function message (the function execution result).
+            /// </summary>
+            Function 
+        };
 
         /// <summary>
         /// The role of the messages author. One of system, user, assistant, or function.
@@ -55,6 +75,12 @@ namespace wtf.cluster.ChatGptLib.Types
             FunctionCall = functionCall;
         }
 
+        /// <summary>
+        /// + operator
+        /// </summary>
+        /// <param name="a">First ChatMessage object.</param>
+        /// <param name="b">Second ChatMessage object.</param>
+        /// <returns>Combined ChatMessage object.</returns>
         public static ChatMessage operator +(ChatMessage a, ChatMessage b)
         {
             var n = new ChatMessage
@@ -73,6 +99,10 @@ namespace wtf.cluster.ChatGptLib.Types
             return n;
         }
 
+        /// <summary>
+        /// ChatMessage string representation
+        /// </summary>
+        /// <returns>ChatMessage string representation</returns>
         public override string ToString() => $"{Role}: {Content ?? FunctionCall?.ToString() ?? string.Empty}";
     }
 }

@@ -17,11 +17,19 @@ namespace wtf.cluster.ChatGptLib
         /// </summary>
         public ChatError ChatError { get; }
 
+        /// <summary>
+        /// Main constructor.
+        /// </summary>
+        /// <param name="error">ChatError object.</param>
         public ChatGptException(ChatError error) : base(error.Message) 
         { 
             ChatError = error;
         }
 
+        /// <summary>
+        /// Error humar-readable message.
+        /// </summary>
+        /// <returns>Error humar-readable message.</returns>
         public override string ToString() => ChatError?.Message ?? string.Empty;
     }
 }
