@@ -84,18 +84,14 @@ internal class Program
     {
         public delegate Task<string> GptFunctionMethod(JsonElement args);
 
-        public required string? Description { get; init; }
-        public required GptFunctionMethod? Function { get; init; }
-        public required IJsonSchema? Parameters { get; init; }
-
-        public GptFunction() { }
-
-        public GptFunction(string description, GptFunctionMethod function, IJsonSchema args)
+        class GptFunction
         {
-            Description = description;
-            Function = function;
-            Parameters = args;
-        }
+            public delegate Task<string> GptFunctionMethod(JsonElement args);
+
+            public required string Description { get; init; }
+            public required GptFunctionMethod Function { get; init; }
+            public required IJsonSchema Parameters { get; init; }
+        }    
     }
 }
 ```
