@@ -17,6 +17,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>openai,gpt,chatgpt</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
