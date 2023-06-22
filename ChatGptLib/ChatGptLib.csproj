@@ -7,6 +7,27 @@
     <RootNamespace>wtf.cluster.ChatGptLib</RootNamespace>
     <AssemblyName>ChatGptLib</AssemblyName>
     <LangVersion>11.0</LangVersion>
+    <Title>ChatGptLib</Title>
+    <Authors>Alexey 'Cluster' Avdyukhin</Authors>
+    <Description>Just another OpenAI client library (chat completion only) with new functions feature support.</Description>
+    <Copyright>Alexey 'Cluster' Avdyukhin</Copyright>
+    <PackageProjectUrl>https://github.com/ClusterM/chatgptlib</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/ClusterM/chatgptlib</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>openai,gpt,chatgpt</PackageTags>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>
