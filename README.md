@@ -96,7 +96,7 @@ internal class Program
 }
 ```
 
-Also, check [GhatGptTests](GhatGptTests) directory, there is YouTube search demo.
+Also, check [GhatGptTests](https://github.com/ClusterM/chatgptlib/tree/master/GhatGptTests) directory, there is YouTube search demo.
 
 ## Download on NuGet
 `dotnet add package ChatGptLib --version 1.0.0`
