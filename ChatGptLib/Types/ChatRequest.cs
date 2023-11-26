@@ -22,7 +22,7 @@ namespace wtf.cluster.ChatGptLib.Types
         /// <summary>
         /// A list of functions the model may generate JSON inputs for.
         /// </summary>
-        [JsonPropertyName("functions")]
+        [JsonPropertyName("tools")]
         public IList<ChatFunction>? Functions { get; set; }
 
         /// <summary>
