@@ -87,6 +87,6 @@ namespace wtf.cluster.ChatGptLib.Types
         /// ChatChoice string representation.
         /// </summary>
         /// <returns>ChatChoice string representation.</returns>
-        public override string ToString() => Message?.ToString() ?? string.Empty;
+        public override string ToString() => Message?.ToString() ?? Delta?.ToString() ?? String.Empty;
     }
 }

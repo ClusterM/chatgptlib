@@ -51,6 +51,6 @@ namespace wtf.cluster.ChatGptLib.Types
         /// ChatFunctionCallRequest string representation.
         /// </summary>
         /// <returns>ChatFunctionCallRequest string representation.</returns>
-        public override string ToString() => $"{Name} - {Arguments}";
+        public override string ToString() => $"{Name ?? "no name"}";
     }
 }

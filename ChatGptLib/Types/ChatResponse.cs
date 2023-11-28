@@ -3,7 +3,7 @@
 namespace wtf.cluster.ChatGptLib.Types
 {
     /// <summary>
-    /// Response received from the API, including the list of choices and the statistics.
+    /// Represents a chat completion response returned by model, based on the provided input.
     /// </summary>
     public class ChatResponse
     {
@@ -18,6 +18,13 @@ namespace wtf.cluster.ChatGptLib.Types
         /// </summary>
         [JsonPropertyName("model")]
         public string? Model { get; internal set; }
+
+        /// <summary>
+        /// This fingerprint represents the backend configuration that the model runs with.
+        /// Can be used in conjunction with the seed request parameter to understand when backend changes have been made that might impact determinism.
+        /// </summary>
+        [JsonPropertyName("system_fingerprint")]
+        public string? SystemFinterprint { get; internal set; }
 
         /// <summary>
         /// Type of the object.
@@ -52,16 +59,18 @@ namespace wtf.cluster.ChatGptLib.Types
         /// The constructor for internal usage.
         /// </summary>
         /// <param name="id">The identifier of the result, which may be used during troubleshooting.</param>
+        /// <param name="systemFinterprint">This fingerprint represents the backend configuration that the model runs with.</param>
         /// <param name="model">The name of the used model.</param>
         /// <param name="object">Type of the object.</param>
         /// <param name="created">Creation timestamp.</param>
         /// <param name="choices">The list of the choices that the user was presented with during the chat interaction.</param>
         /// <param name="usage">The usage statistics for the chat interaction.</param>
         [JsonConstructor]
-        public ChatResponse(string? id, string? model, string? @object, int? created, IReadOnlyList<ChatChoice> choices, ChatUsage? usage)
+        public ChatResponse(string? id, string? model, string? systemFinterprint, string? @object, int? created, IReadOnlyList<ChatChoice> choices, ChatUsage? usage = null)
         {
             Id = id;
             Model = model;
+            SystemFinterprint = systemFinterprint;
             Object = @object;
             Created = created;
             Choices = choices;
@@ -80,6 +89,7 @@ namespace wtf.cluster.ChatGptLib.Types
             {
                 Id = a.Id ?? b.Id,
                 Model = a.Model ?? b.Model,
+                SystemFinterprint = a.SystemFinterprint ?? b.SystemFinterprint,
                 Object = a.Object ?? b.Object,
                 Created = a.Created ?? b.Created,
                 Usage = a.Usage ?? b.Usage
@@ -105,6 +115,6 @@ namespace wtf.cluster.ChatGptLib.Types
         /// ChatResponse string representation.
         /// </summary>
         /// <returns>ChatResponse string representation.</returns>
-        public override string ToString() => Choices?.FirstOrDefault()?.ToString() ?? string.Empty;
+        public override string ToString() => Choices != null ? string.Concat(Choices.Select(ch => $"{ch}"), ", ") : String.Empty;
     }
 }

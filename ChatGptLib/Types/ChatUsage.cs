@@ -38,5 +38,11 @@ namespace wtf.cluster.ChatGptLib.Types
             CompletionTokens = completionTokens;
             TotalTokens = totalTokens;
         }
+
+        /// <summary>
+        /// ChatUsage string representation.
+        /// </summary>
+        /// <returns>ChatUsage string representation.</returns>
+        public override string ToString() => $"{TotalTokens} tokens";
     }
 }

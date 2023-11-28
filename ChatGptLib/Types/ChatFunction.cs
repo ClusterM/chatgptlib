@@ -25,5 +25,11 @@ namespace wtf.cluster.ChatGptLib.Types
         /// </summary>
         [JsonPropertyName("parameters")]
         public required IJsonSchema Parameters { get; set; }
+
+        /// <summary>
+        /// ChatFunction string representation.
+        /// </summary>
+        /// <returns>ChatFunction string representation.</returns>
+        public override string ToString() => $"{Name} ({Description})";
     }
 }

@@ -46,6 +46,12 @@ namespace wtf.cluster.ChatGptLib.Types
             Param = param;
             Code = code;
         }
+
+        /// <summary>
+        /// ChatError string representation.
+        /// </summary>
+        /// <returns>ChatError string representation.</returns>
+        public override string ToString() => Message ?? String.Empty;
     }
 
     /// <summary>
@@ -68,5 +74,11 @@ namespace wtf.cluster.ChatGptLib.Types
         {
             Error = error;
         }
+
+        /// <summary>
+        /// ChatGptErrorContainer string representation.
+        /// </summary>
+        /// <returns>ChatError string representation.</returns>
+        public override string ToString() => $"{Error}" ?? String.Empty;
     }
 }

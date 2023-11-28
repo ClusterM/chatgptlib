@@ -22,11 +22,19 @@ namespace wtf.cluster.ChatGptLib.Types
         /// <summary>
         /// A list of functions the model may generate JSON inputs for.
         /// </summary>
-        [JsonPropertyName("tools")]
+        [JsonPropertyName("functions")]
+        [Obsolete("Use 'tools'")]
         public IList<ChatFunction>? Functions { get; set; }
 
         /// <summary>
+        /// A list of tools the model may call. Currently, only functions are supported as a tool. Use this to provide a list of functions the model may generate JSON inputs for.
+        /// </summary>
+        [JsonPropertyName("tools")]
+        public IList<ChatTool>? Tools { get; set; }
+
+        /// <summary>
         /// What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.
+        /// Default is 1.
         /// </summary>
         [JsonPropertyName("temperature")]
         public double? Temperature { get; set; }
@@ -65,12 +73,14 @@ namespace wtf.cluster.ChatGptLib.Types
 
         /// <summary>
         /// Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.
+        /// Default is 0.
         /// </summary>
         [JsonPropertyName("presence_penalty")]
         public double? PresencePenalty { get; set; }
 
         /// <summary>
         /// Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.
+        /// Default is 0.
         /// </summary>
         [JsonPropertyName("frequency_penalty")]
         public double? FrequencyPenalty { get; set; }
@@ -88,5 +98,18 @@ namespace wtf.cluster.ChatGptLib.Types
         /// </summary>
         [JsonPropertyName("user")]
         public string? User { get; set; }
+
+        /// <summary>
+        /// If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result.
+        /// Determinism is not guaranteed, and you should refer to the system_fingerprint response parameter to monitor changes in the backend.
+        /// </summary>
+        [JsonPropertyName("seed")]
+        public int? Seed { get; set; }
+
+        /// <summary>
+        /// ChatRequest string representation
+        /// </summary>
+        /// <returns>ChatRequest string representation</returns>
+        public override string ToString() => Messages?.LastOrDefault()?.ToString() ?? String.Empty;
     }
 }

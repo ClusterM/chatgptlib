@@ -13,7 +13,7 @@ namespace GhatGptTests
         const string YouTubeApiKey = "<insert your YouTube API key here>";
 
         //const string RequestText = "How much o'clock? Also, can you say the current date? And day of the week.";
-        const string RequestText = "Please find Rick Roll video on YouTube and give me the link to the largest preview image.";
+        const string RequestText = "Please find Rick Roll video on YouTube and give me the link to the largest preview image. Also, say what time is it now.";
         //const string RequestText = "Please find the most popular video on YouTube.";        
 
         static async Task Main(string[] args)
@@ -73,9 +73,10 @@ namespace GhatGptTests
             {
                 var request = new ChatRequest()
                 {
-                    Model = "gpt-4-0613",
+                    Model = "gpt-4-1106-preview",
                     Messages = messages,
-                    Functions = new List<ChatFunction>(functions.Select(kv => new ChatFunction() { Name = kv.Key, Description = kv.Value.Description, Parameters = kv.Value.Parameters })),
+                    Tools = new List<ChatTool>(functions.Select(kv => new ChatTool() { Type = ChatTool.ToolType.Function, Function = new ChatFunction() { Name = kv.Key, Description = kv.Value.Description, Parameters = kv.Value.Parameters } })),
+                    //Functions = new List<ChatFunction>(functions.Select(kv => new ChatFunction() { Name = kv.Key, Description = kv.Value.Description, Parameters = kv.Value.Parameters })),
                     Temperature = 0.5
                 };
                 // Create empty response
@@ -87,32 +88,41 @@ namespace GhatGptTests
                     // You can just use + operator to combine stream chunks
                     completionResult = completionResult! + p;
                     // Skip if it's function call
-                    if (completionResult?.Choices?.First()?.Message?.FunctionCall != null)
+                    if (completionResult?.Choices?.First()?.Message?.ToolCalls != null)
                         continue;
                     // Print partial data
                     if (p.Choices?.FirstOrDefault()?.Delta != null)
                         Console.Write(p.Choices.First().Delta!.Content);
                 }
-                if (completionResult?.Choices?.First()?.Message?.FunctionCall == null)
-                    Console.WriteLine();
-                else
-                    Console.WriteLine($"Function call: {completionResult?.Choices?.First()?.Message?.FunctionCall}");
                 // Append message to the chat history
                 var msg = completionResult!.Choices.FirstOrDefault()?.Message!;
                 messages.Add(msg);
-                if (msg.FunctionCall?.Name != null)
+                if (msg.ToolCalls != null && msg.ToolCalls.Any())
                 {
-                    // It's function call
-                    if (!functions.TryGetValue(msg.FunctionCall.Name, out GptFunction? function))
-                        throw new NotImplementedException($"Unknown function: {msg.FunctionCall.Name}");
-                    // calling the fuctions
-                    var argsDoc = JsonDocument.Parse(msg.FunctionCall.Arguments!);
-                    var functionResult = await function!.Function(argsDoc.RootElement);
-                    Console.WriteLine($"Function call result: {functionResult}");
-
-                    // Need to add function result to the chat history
-                    var functionResultMessage = new ChatMessage(ChatMessageRole.Function, functionResult, msg.FunctionCall.Name);
-                    messages.Add(functionResultMessage);
+                    foreach (var tool in msg.ToolCalls)
+                    {
+                        switch (tool.Type)
+                        {
+                            case ChatTool.ToolType.Function:
+                                // It's function call
+                                Console.WriteLine($"Function call: {tool.Function}");
+                                if (!functions.TryGetValue(tool.Function!.Name!, out GptFunction? function))
+                                    throw new NotImplementedException($"Unknown function: {tool.Function!.Name}");
+                                // calling the fuctions
+                                var argsDoc = JsonDocument.Parse(tool.Function!.Arguments!);
+                                var functionResult = await function!.Function(argsDoc.RootElement);
+                                Console.WriteLine($"Function call result: {functionResult}");
+                                // Need to add function result to the chat history
+                                var functionResultMessage = new ChatMessage(ChatMessageRole.Tool, functionResult, tool.Function?.Name)
+                                {
+                                    ToolCallId = tool.Id
+                                };
+                                messages.Add(functionResultMessage);
+                                break;
+                            default:
+                                throw new NotImplementedException($"Unknown tool type: {tool.Type}");
+                        }
+                    }                
                 }
                 else
                 {
