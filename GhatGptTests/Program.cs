@@ -1,8 +1,10 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Web;
 using wtf.cluster.ChatGptLib;
 using wtf.cluster.ChatGptLib.Types;
+using wtf.cluster.ChatGptLib.Types.Content;
 using wtf.cluster.ChatGptLib.Types.JsonSchema;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using static wtf.cluster.ChatGptLib.Types.ChatMessage;
 
 namespace GhatGptTests
@@ -13,14 +15,22 @@ namespace GhatGptTests
         const string YouTubeApiKey = "<insert your YouTube API key here>";
 
         //const string RequestText = "How much o'clock? Also, can you say the current date? And day of the week.";
-        const string RequestText = "Please find Rick Roll video on YouTube and give me the link to the largest preview image. Also, say what time is it now.";
-        //const string RequestText = "Please find the most popular video on YouTube.";        
+        const string RequestFunctionsText = "Please find Rick Roll video on YouTube and give me the link to the largest preview image. Also, say what time is it now.";
+        const string RequestImageText = "What’s in this image?";
+        const string ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Oreo-Size-Variations.jpg/2880px-Oreo-Size-Variations.jpg";
 
-        static async Task Main(string[] args)
+        static async Task Main()
+        {
+            await FunctionsTest();
+            Console.WriteLine();
+            await ImageTest();
+        }
+
+        static async Task FunctionsTest()
         {
             var messages = new List<ChatMessage>()
             {
-                new ChatMessage() { Role = ChatMessage.ChatMessageRole.User, Content = RequestText }
+                new ChatMessage(ChatMessageRole.User, RequestFunctionsText)
             };
             var functions = new Dictionary<string, GptFunction>
             {
@@ -56,7 +66,7 @@ namespace GhatGptTests
                             ["videoSyndicated"] = new JsonStringSchema(),
                             ["videoType"] = new JsonStringSchema(),
                         },
-                        Required = new List<string> { "part" }
+                        Required = new string[] { "part" }
                     },
                     Function = YouTubeSearch
                 },
@@ -76,7 +86,6 @@ namespace GhatGptTests
                     Model = "gpt-4-1106-preview",
                     Messages = messages,
                     Tools = new List<ChatTool>(functions.Select(kv => new ChatTool() { Type = ChatTool.ToolType.Function, Function = new ChatFunction() { Name = kv.Key, Description = kv.Value.Description, Parameters = kv.Value.Parameters } })),
-                    //Functions = new List<ChatFunction>(functions.Select(kv => new ChatFunction() { Name = kv.Key, Description = kv.Value.Description, Parameters = kv.Value.Parameters })),
                     Temperature = 0.5
                 };
                 // Create empty response
@@ -105,13 +114,13 @@ namespace GhatGptTests
                         {
                             case ChatTool.ToolType.Function:
                                 // It's function call
-                                Console.WriteLine($"Function call: {tool.Function}");
+                                Console.WriteLine($"Function call: {tool.Function?.Name}");
                                 if (!functions.TryGetValue(tool.Function!.Name!, out GptFunction? function))
                                     throw new NotImplementedException($"Unknown function: {tool.Function!.Name}");
                                 // calling the fuctions
                                 var argsDoc = JsonDocument.Parse(tool.Function!.Arguments!);
                                 var functionResult = await function!.Function(argsDoc.RootElement);
-                                Console.WriteLine($"Function call result: {functionResult}");
+                                //Console.WriteLine($"Function call result: {functionResult}");
                                 // Need to add function result to the chat history
                                 var functionResultMessage = new ChatMessage(ChatMessageRole.Tool, functionResult, tool.Function?.Name)
                                 {
@@ -122,14 +131,48 @@ namespace GhatGptTests
                             default:
                                 throw new NotImplementedException($"Unknown tool type: {tool.Type}");
                         }
-                    }                
+                    }
                 }
                 else
                 {
                     // Text answer received, done.
+                    Console.WriteLine();
                     break;
                 }
             }
+
+        }
+
+        static async Task ImageTest()
+        {
+            var messages = new List<ChatMessage>()
+            {
+                new ChatMessage(ChatMessageRole.User, new ChatContentParts(
+                    new List<IChatContentPart>()
+                    {
+                        new ChatContentPartText(RequestImageText),
+                        new ChatContentPartImageUrl(ImageUrl)
+                    }
+                ))
+            };
+            var request = new ChatRequest()
+            {
+                Model = "gpt-4-vision-preview",
+                Messages = messages,
+                Temperature = 0,
+                MaxTokens = 4096
+            };
+            var gptApi = new ChatGptClient(OpenAIKey);
+            var completionResult = new ChatResponse();
+            var completionResultStream = gptApi.RequestStreamAsync(request);
+            // Process stream data
+            await foreach (var p in completionResultStream)
+            {
+                // Print partial data
+                if (p.Choices?.FirstOrDefault()?.Delta != null)
+                    Console.Write(p.Choices.First().Delta!.Content);
+            }
+            Console.WriteLine();
         }
 
         static async Task<string> YouTubeSearch(JsonElement args)

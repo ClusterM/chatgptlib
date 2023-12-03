@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using wtf.cluster.ChatGptLib.Types.JsonSchema;
 
 namespace wtf.cluster.ChatGptLib.Types

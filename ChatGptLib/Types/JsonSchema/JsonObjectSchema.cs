@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace wtf.cluster.ChatGptLib.Types.JsonSchema
 {
@@ -29,6 +29,6 @@ namespace wtf.cluster.ChatGptLib.Types.JsonSchema
         /// List of the required fields of the object.
         /// </summary>
         [JsonPropertyName("required")]
-        public List<string>? Required { get; set; }
+        public IList<string>? Required { get; set; }
     }
 }

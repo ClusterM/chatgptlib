@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +13,7 @@ using System.Text.Json.Nodes;
 using System.Reflection.PortableExecutable;
 using static System.Net.Mime.MediaTypeNames;
 using System.Diagnostics;
+using wtf.cluster.ChatGptLib.Types.Content;
 
 namespace wtf.cluster.ChatGptLib
 {
@@ -48,9 +49,12 @@ namespace wtf.cluster.ChatGptLib
             var options = new JsonSerializerOptions { 
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
-            options.Converters.Add(new JsonSchemaConverter());
+            options.Converters.Add(new IJsonSchema.JsonSchemaConverter());
+            options.Converters.Add(new IChatContent.ChatContentConverter());
+            options.Converters.Add(new IChatContentPart.ChatContentPartConverter());
             options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
             var jsonString = JsonSerializer.Serialize(request, options);
+            jsonString = jsonString.Insert(1, "\"stream\":false, "); // oh, crutch
             var contentString = new StringContent(jsonString, Encoding.UTF8, "application/json");
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, Endpoint);
             requestMessage.Content = contentString;
@@ -82,10 +86,12 @@ namespace wtf.cluster.ChatGptLib
             var options = new JsonSerializerOptions { 
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
-            options.Converters.Add(new JsonSchemaConverter());
+            options.Converters.Add(new IJsonSchema.JsonSchemaConverter());
+            options.Converters.Add(new IChatContent.ChatContentConverter());
+            options.Converters.Add(new IChatContentPart.ChatContentPartConverter());
             options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
             var jsonString = JsonSerializer.Serialize(request, options);
-            jsonString = jsonString.Insert(1, "\"stream\": true, "); // oh, crutch
+            jsonString = jsonString.Insert(1, "\"stream\":true, "); // oh, crutch
             var contentString = new StringContent(jsonString, Encoding.UTF8, "application/json");
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, Endpoint);
             requestMessage.Content = contentString;
