@@ -4,7 +4,6 @@ using wtf.cluster.ChatGptLib;
 using wtf.cluster.ChatGptLib.Types;
 using wtf.cluster.ChatGptLib.Types.Content;
 using wtf.cluster.ChatGptLib.Types.JsonSchema;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using static wtf.cluster.ChatGptLib.Types.ChatMessage;
 
 namespace GhatGptTests
@@ -14,7 +13,6 @@ namespace GhatGptTests
         const string OpenAIKey = "<insert your OpenAI API key here>";
         const string YouTubeApiKey = "<insert your YouTube API key here>";
 
-        //const string RequestText = "How much o'clock? Also, can you say the current date? And day of the week.";
         const string RequestFunctionsText = "Please find Rick Roll video on YouTube and give me the link to the largest preview image. Also, say what time is it now.";
         const string RequestImageText = "What’s in this image?";
         const string ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Oreo-Size-Variations.jpg/2880px-Oreo-Size-Variations.jpg";
