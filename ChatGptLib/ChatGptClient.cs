@@ -96,7 +96,7 @@ namespace wtf.cluster.ChatGptLib
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, Endpoint);
             requestMessage.Content = contentString;
             using var response = await client.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead);
-            using var stream = response.Content.ReadAsStream();
+            using var stream = await response.Content.ReadAsStreamAsync();
             using StreamReader reader = new StreamReader(stream);
             string? line;
             while ((line = await reader.ReadLineAsync().ConfigureAwait(false)) != null)

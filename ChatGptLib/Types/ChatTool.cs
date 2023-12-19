@@ -36,6 +36,16 @@ namespace wtf.cluster.ChatGptLib.Types
         public ChatFunction? Function { get; set; }
 
         /// <summary>
+        /// ChatTool constructor for function.
+        /// </summary>
+        /// <param name="function"></param>
+        public ChatTool(ChatFunction function)
+        {
+            Type = ToolType.Function;
+            Function = function;
+        }
+
+        /// <summary>
         /// ChatTool string representation.
         /// </summary>
         /// <returns>ChatTool string representation.</returns>

@@ -40,10 +40,10 @@ namespace wtf.cluster.ChatGptLib.Types.Content
         public static explicit operator string(ChatContentText t) => t.Text;
 
         /// <summary>
-        /// Explicit string conversion to ChatContentText.
+        /// Implicit string conversion to ChatContentText.
         /// </summary>
-        /// <param name="t">ChatContentText</param>
-        public static explicit operator ChatContentText(string t) => new ChatContentText(t);
+        /// <param name="t">Input string</param>
+        public static implicit operator ChatContentText(string t) => new ChatContentText(t);
 
         /// <summary>
         /// ChatContentText string representation.

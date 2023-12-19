@@ -41,6 +41,7 @@ namespace wtf.cluster.ChatGptLib.Types
 
         /// <summary>
         /// An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.
+        /// Default is 0.5.
         /// </summary>
         [JsonPropertyName("top_p")]
         public double? TopP { get; set; }
