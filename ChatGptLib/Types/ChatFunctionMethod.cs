@@ -12,8 +12,9 @@ namespace wtf.cluster.ChatGptLib.Types
         /// Function callback delegate.
         /// </summary>
         /// <param name="args">Function call arguments as parsed JSON.</param>
+        /// <param name="o">Optional object to pass to a function.</param>
         /// <returns>Function result as string.</returns>
-        public delegate Task<string> Callback(JsonElement args);
+        public delegate Task<string> Callback(JsonElement args, object? o);
 
         /// <summary>
         /// Function description.

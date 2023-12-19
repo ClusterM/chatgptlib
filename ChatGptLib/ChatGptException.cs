@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using wtf.cluster.ChatGptLib.Types;
 
 namespace wtf.cluster.ChatGptLib
@@ -21,8 +16,8 @@ namespace wtf.cluster.ChatGptLib
         /// Main constructor.
         /// </summary>
         /// <param name="error">ChatError object.</param>
-        public ChatGptException(ChatError error) : base(error.Message) 
-        { 
+        public ChatGptException(ChatError error) : base(error.Message)
+        {
             ChatError = error;
         }
 

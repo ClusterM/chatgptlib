@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 using wtf.cluster.ChatGptLib.Types;
 using static wtf.cluster.ChatGptLib.Types.ChatMessage;
 
@@ -98,7 +91,7 @@ namespace wtf.cluster.ChatGptLib
         /// </summary>
         /// <param name="apiKey">OpenAI API key.</param>
         /// <param name="model">Model name.</param>
-        public ChatGptConversation(string apiKey, string model)
+        public ChatGptConversation(string apiKey, string model = "")
         {
             Model = model;
             gpt = new ChatGptClient(apiKey);
@@ -112,10 +105,18 @@ namespace wtf.cluster.ChatGptLib
             => Messages.Add(new ChatMessage(role: ChatMessage.ChatMessageRole.User, content: message));
 
         /// <summary>
+        /// Add ChatMessage to the history.
+        /// </summary>
+        /// <param name="message">Message text.</param>
+        public void AddMessage(ChatMessage message)
+            => Messages.Add(message);
+
+        /// <summary>
         /// Get next assistant answer.
         /// </summary>
+        /// <param name="o">Optional object to pass to a functions.</param>
         /// <returns>Assistent answer as string.</returns>
-        public async Task<string> GetAnswerAsync()
+        public async Task<string> GetAnswerAsync(object? o = null)
         {
             ChatMessage? msg = null;
 
@@ -168,7 +169,7 @@ namespace wtf.cluster.ChatGptLib
                                     throw new NotImplementedException($"Unknown function: {tool.Function!.Name}");
                                 // Call the function
                                 var argsDoc = JsonDocument.Parse(tool.Function!.Arguments!);
-                                var functionResult = await function!.Function(argsDoc.RootElement);
+                                var functionResult = await function!.Function(argsDoc.RootElement, o);
                                 // Need to add function result to the chat history
                                 var functionResultMessage = new ChatMessage(ChatMessageRole.Tool, functionResult, tool.Function?.Name)
                                 {
@@ -189,11 +190,12 @@ namespace wtf.cluster.ChatGptLib
         /// <summary>
         /// Get next assistant answer as a async text stream.
         /// </summary>
+        /// <param name="o">Optional object to pass to a functions.</param>
         /// <returns>Assistent answer as string (parts).</returns>
-        public async IAsyncEnumerable<string> GetAnswerStreamAsync()
+        public async IAsyncEnumerable<string> GetAnswerStreamAsync(object? o = null)
         {
             ChatMessage? msg = null;
-            
+
             RemoveOldMessages();
 
             do
@@ -232,7 +234,9 @@ namespace wtf.cluster.ChatGptLib
                     completionResult = completionResult! + p;
                     if (completionResult?.Choices?.First()?.Message?.ToolCalls != null)
                         continue;
-                    yield return $"{p.Choices?.FirstOrDefault()?.Delta?.Content}";
+                    var r = p.Choices?.FirstOrDefault()?.Delta?.Content?.ToString();
+                    if (!String.IsNullOrEmpty(r))
+                        yield return r;
                 }
                 msg = completionResult!.Choices.First().Message!;
                 // Add message to the history
@@ -251,7 +255,7 @@ namespace wtf.cluster.ChatGptLib
                                     throw new NotImplementedException($"Unknown function: {tool.Function!.Name}");
                                 // Call the function
                                 var argsDoc = JsonDocument.Parse(tool.Function!.Arguments!);
-                                var functionResult = await function!.Function(argsDoc.RootElement);
+                                var functionResult = await function!.Function(argsDoc.RootElement, o);
                                 // Need to add function result to the chat history
                                 var functionResultMessage = new ChatMessage(ChatMessageRole.Tool, functionResult, tool.Function?.Name)
                                 {
@@ -266,6 +270,7 @@ namespace wtf.cluster.ChatGptLib
                 }
                 // Until there is no tool calls
             } while (msg?.ToolCalls?.Any() == true);
+            yield return String.Empty;
         }
 
         private void RemoveOldMessages()

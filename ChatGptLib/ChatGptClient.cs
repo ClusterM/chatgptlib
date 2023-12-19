@@ -1,19 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Text.Json;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 using wtf.cluster.ChatGptLib.Types;
-using wtf.cluster.ChatGptLib.Types.JsonSchema;
-using System.Net.Http.Json;
-using System.Runtime.InteropServices.JavaScript;
-using System.Text.Json.Nodes;
-using System.Reflection.PortableExecutable;
-using static System.Net.Mime.MediaTypeNames;
-using System.Diagnostics;
 using wtf.cluster.ChatGptLib.Types.Content;
+using wtf.cluster.ChatGptLib.Types.JsonSchema;
 
 namespace wtf.cluster.ChatGptLib
 {
@@ -46,7 +36,8 @@ namespace wtf.cluster.ChatGptLib
         /// <exception cref="InvalidDataException"></exception>
         public async Task<ChatResponse> RequestAsync(ChatRequest request)
         {
-            var options = new JsonSerializerOptions { 
+            var options = new JsonSerializerOptions
+            {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
             options.Converters.Add(new IJsonSchema.JsonSchemaConverter());
@@ -82,8 +73,9 @@ namespace wtf.cluster.ChatGptLib
         /// <exception cref="HttpRequestException"></exception>
         /// <exception cref="InvalidDataException"></exception>
         public async IAsyncEnumerable<ChatResponse> RequestStreamAsync(ChatRequest request)
-        {            
-            var options = new JsonSerializerOptions { 
+        {
+            var options = new JsonSerializerOptions
+            {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
             options.Converters.Add(new IJsonSchema.JsonSchemaConverter());

@@ -43,7 +43,7 @@ namespace wtf.cluster.ChatGptLib.Types.Content
         /// Implicit string conversion to ChatContentText.
         /// </summary>
         /// <param name="t">Input string</param>
-        public static implicit operator ChatContentText(string t) => new ChatContentText(t);
+        public static implicit operator ChatContentText(string t) => new(t);
 
         /// <summary>
         /// ChatContentText string representation.
