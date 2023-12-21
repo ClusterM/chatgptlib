@@ -9,7 +9,7 @@
     <LangVersion>11.0</LangVersion>
     <Title>ChatGptLib</Title>
     <Authors>Alexey 'Cluster' Avdyukhin</Authors>
-    <Description>Just another OpenAI client library (chat completion only) with new functions feature support.</Description>
+    <Description>Just another OpenAI client library (chat completion only) with functions/tool feature support.</Description>
     <Copyright>Alexey 'Cluster' Avdyukhin</Copyright>
     <PackageProjectUrl>https://github.com/ClusterM/chatgptlib</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>

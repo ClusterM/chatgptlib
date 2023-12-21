@@ -119,11 +119,11 @@ namespace wtf.cluster.ChatGptLib
         public async Task<string> GetAnswerAsync(object? o = null)
         {
             ChatMessage? msg = null;
-
             RemoveOldMessages();
 
             do
             {
+                var newMessages = new List<ChatMessage>();
                 // Add system message
                 var tmpMessages = new List<ChatMessage>(Messages);
                 if (!String.IsNullOrEmpty(SystemMessage))
@@ -142,19 +142,19 @@ namespace wtf.cluster.ChatGptLib
                     Seed = Seed,
                     Messages = tmpMessages,
                     N = 1,
-                    Tools = new List<ChatTool>(Functions.Select(kv => new ChatTool(new ChatFunction()
+                    Tools = Functions.Any() ? new List<ChatTool>(Functions.Select(kv => new ChatTool(new ChatFunction()
                     {
                         Name = kv.Key,
                         Description = kv.Value.Description,
                         Parameters = kv.Value.Parameters
-                    })))
+                    }))) : null
                 };
 
                 // Make request
                 var completionResult = await gpt.RequestAsync(request);
                 msg = completionResult.Choices.First().Message!;
                 // Add message to the history
-                Messages.Add(msg);
+                newMessages.Add(msg);
 
                 // Proceed tools/functions if any
                 if (msg.ToolCalls?.Any() == true)
@@ -175,15 +175,17 @@ namespace wtf.cluster.ChatGptLib
                                 {
                                     ToolCallId = tool.Id
                                 };
-                                Messages.Add(functionResultMessage);
+                                newMessages.Add(functionResultMessage);
                                 break;
                             default:
                                 throw new NotImplementedException($"Unknown tool type: {tool.Type}");
                         }
                     }
                 }
+                Messages.AddRange(newMessages);
                 // Until there is no tool calls
             } while (msg?.ToolCalls?.Any() == true);
+            
             return $"{msg?.Content}";
         }
 
@@ -200,6 +202,7 @@ namespace wtf.cluster.ChatGptLib
 
             do
             {
+                var newMessages = new List<ChatMessage>();
                 // Add system message
                 var tmpMessages = new List<ChatMessage>(Messages);
                 if (!String.IsNullOrEmpty(SystemMessage))
@@ -240,7 +243,7 @@ namespace wtf.cluster.ChatGptLib
                 }
                 msg = completionResult!.Choices.First().Message!;
                 // Add message to the history
-                Messages.Add(msg);
+                newMessages.Add(msg);
 
                 // Proceed tools/functions if any
                 if (msg.ToolCalls?.Any() == true)
@@ -261,13 +264,14 @@ namespace wtf.cluster.ChatGptLib
                                 {
                                     ToolCallId = tool.Id
                                 };
-                                Messages.Add(functionResultMessage);
+                                newMessages.Add(functionResultMessage);
                                 break;
                             default:
                                 throw new NotImplementedException($"Unknown tool type: {tool.Type}");
                         }
                     }
                 }
+                Messages.AddRange(newMessages);
                 // Until there is no tool calls
             } while (msg?.ToolCalls?.Any() == true);
             yield return String.Empty;
