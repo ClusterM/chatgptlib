@@ -22,18 +22,17 @@ namespace wtf.cluster.ChatGptLib.Types.Content
         /// <summary>
         /// ChatContentPartImageUrl constructor.
         /// </summary>
-        /// <param name="imageUrl">Image URL as ImageUrl object.</param>
-        /// <exception cref="InvalidDataException"></exception>
-        public ChatContentPartImageUrl(ImageUrl imageUrl)
+        /// <param name="image">Image URL as ImageUrl object.</param>
+        [JsonConstructor]
+        public ChatContentPartImageUrl(ImageUrl image)
         {
-            Image = imageUrl;
+            Image = image;
         }
 
         /// <summary>
         /// ChatContentPartImageUrl constructor.
         /// </summary>
         /// <param name="imageUrl">Image URL as string.</param>
-        /// <exception cref="InvalidDataException"></exception>
         public ChatContentPartImageUrl(string imageUrl) : this(new ImageUrl(imageUrl)) { }
 
         /// <summary>
@@ -50,8 +49,9 @@ namespace wtf.cluster.ChatGptLib.Types.Content
             /// <summary>
             /// ImageUrl constructor.
             /// </summary>
-            /// <param name="imageUrl">Image URL as string.</param>
-            public ImageUrl(string imageUrl) => Url = imageUrl;
+            /// <param name="url">Image URL as string.</param>
+            [JsonConstructor]
+            public ImageUrl(string url) => Url = url;
         }
     }
 }

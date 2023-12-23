@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace wtf.cluster.ChatGptLib.Types.Content
 {
@@ -22,10 +23,22 @@ namespace wtf.cluster.ChatGptLib.Types.Content
             /// <summary>
             /// IChatContentPart objects deserializer, unused.
             /// </summary>
-            /// <exception cref="NotImplementedException"></exception>
             public override IChatContentPart? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
             {
-                throw new NotImplementedException();
+                using (JsonDocument document = JsonDocument.ParseValue(ref reader))
+                {
+                    JsonElement root = document.RootElement;
+                    var t = root.GetProperty("type");
+                    switch (t.GetString())
+                    {
+                        case "text":
+                            return root.Deserialize<ChatContentPartText>(options);
+                        case "image_url":
+                            return root.Deserialize<ChatContentPartImageUrl>(options);
+                        default:
+                            throw new JsonException($"Can't deserialize {typeToConvert} object");
+                    }
+                }
             }
 
             /// <summary>

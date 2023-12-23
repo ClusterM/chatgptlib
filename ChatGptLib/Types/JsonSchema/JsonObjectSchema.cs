@@ -30,5 +30,24 @@ namespace wtf.cluster.ChatGptLib.Types.JsonSchema
         /// </summary>
         [JsonPropertyName("required")]
         public IList<string>? Required { get; set; }
+
+        /// <summary>
+        /// The constructor for an empty object.
+        /// </summary>
+        public JsonObjectSchema() { }
+
+        /// <summary>
+        /// JsonObjectSchema constructor with the arguments.
+        /// </summary>
+        /// <param name="description">Description</param>
+        /// <param name="properties">Properties as name-schema dictionary.</param>
+        /// <param name="required">List of required properties.</param>
+        [JsonConstructor]
+        public JsonObjectSchema(string? description, Dictionary<string, IJsonSchema>? properties, IList<string>? required = null)
+        {
+            Description = description;
+            Properties = properties ?? new();
+            Required = required;
+        }
     }
 }

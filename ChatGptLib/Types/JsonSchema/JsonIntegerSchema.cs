@@ -1,3 +1,4 @@
+using System.Diagnostics.Contracts;
 using System.Text.Json.Serialization;
 
 namespace wtf.cluster.ChatGptLib.Types.JsonSchema
@@ -36,5 +37,26 @@ namespace wtf.cluster.ChatGptLib.Types.JsonSchema
         /// </summary>
         [JsonPropertyName("multipleOf")]
         public double? MultipleOf { get; set; }
+
+        /// <summary>
+        /// The constructor for an empty object.
+        /// </summary>
+        public JsonIntegerSchema() { }
+
+        /// <summary>
+        /// JsonIntegerSchema constructor with the arguments.
+        /// </summary>
+        /// <param name="description">Description.</param>
+        /// <param name="minimum">Minimum value.</param>
+        /// <param name="maximum">Maximum value.</param>
+        /// <param name="multipleOf">Integers can be restricted to a multiple of a given number.</param>
+        [JsonConstructor]
+        public JsonIntegerSchema(string? description, double? minimum = null, double? maximum = null, double? multipleOf = null)
+        {
+            Description = description;
+            Minimum = minimum;
+            Maximum = maximum;
+            MultipleOf = multipleOf;
+        }
     }
 }

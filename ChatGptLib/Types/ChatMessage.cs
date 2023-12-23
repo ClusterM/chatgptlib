@@ -77,7 +77,7 @@ namespace wtf.cluster.ChatGptLib.Types
         public string? ToolCallId { get; set; }
 
         /// <summary>
-        /// The constructor for empty object.
+        /// The constructor for an empty object.
         /// </summary>
         public ChatMessage() { }
 

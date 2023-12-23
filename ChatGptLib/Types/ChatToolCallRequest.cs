@@ -11,20 +11,20 @@ namespace wtf.cluster.ChatGptLib.Types
         /// The ID of the tool call.
         /// </summary>
         [JsonPropertyName("id")]
-        public string Id { get; init; }
+        public string Id { get; }
 
         /// <summary>
         /// The type of the tool. Currently, only function is supported.
         /// Can be partial when using streaming, so do not parse it until the data has been fully received.
         /// </summary>
         [JsonPropertyName("type")]
-        public ChatTool.ToolType? Type { get; init; }
+        public ChatTool.ToolType? Type { get; }
 
         /// <summary>
         /// The function that the model called.
         /// </summary>
         [JsonPropertyName("function")]
-        public ChatFunctionCallRequest? Function { get; init; }
+        public ChatFunctionCallRequest? Function { get; }
 
         /// <summary>
         /// The constructor for internal usage.

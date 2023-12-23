@@ -31,19 +31,9 @@ namespace wtf.cluster.ChatGptLib
         /// </summary>
         /// <param name="request">The ChatRequest object describing request data</param>
         /// <returns>The response from the OpenAI API as ChatResponse object</returns>
-        /// <exception cref="ChatGptException"></exception>
-        /// <exception cref="HttpRequestException"></exception>
-        /// <exception cref="InvalidDataException"></exception>
         public async Task<ChatResponse> RequestAsync(ChatRequest request)
         {
-            var options = new JsonSerializerOptions
-            {
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-            };
-            options.Converters.Add(new IJsonSchema.JsonSchemaConverter());
-            options.Converters.Add(new IChatContent.ChatContentConverter());
-            options.Converters.Add(new IChatContentPart.ChatContentPartConverter());
-            options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+            var options = GetJsonOptions();
             var jsonString = JsonSerializer.Serialize(request, options);
             jsonString = jsonString.Insert(1, "\"stream\":false, "); // oh, crutch
             var contentString = new StringContent(jsonString, Encoding.UTF8, "application/json");
@@ -60,29 +50,19 @@ namespace wtf.cluster.ChatGptLib
             // Deserialize!
             var result = JsonSerializer.Deserialize<ChatResponse>(responseString, options);
             if (result == null)
-                throw new InvalidDataException($"Can't parse JSON: {result}");
+                throw new JsonException($"Can't parse JSON: {result}");
             return result;
         }
 
         /// <summary>
-        /// The steaming request to the OpenAI API
+        /// The steaming request to the OpenAI API.
         /// </summary>
-        /// <param name="request">The ChatRequest object describing request data</param>
-        /// <returns>The response from the OpenAI API as a ChatResponse enumerator with partial data chunks</returns>
-        /// <exception cref="ChatGptException"></exception>
-        /// <exception cref="HttpRequestException"></exception>
-        /// <exception cref="InvalidDataException"></exception>
+        /// <param name="request">The ChatRequest object describing request data.</param>
+        /// <returns>The response from the OpenAI API as a ChatResponse enumerator with partial data chunks.</returns>
         public async IAsyncEnumerable<ChatResponse> RequestStreamAsync(ChatRequest request)
         {
-            var options = new JsonSerializerOptions
-            {
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-            };
-            options.Converters.Add(new IJsonSchema.JsonSchemaConverter());
-            options.Converters.Add(new IChatContent.ChatContentConverter());
-            options.Converters.Add(new IChatContentPart.ChatContentPartConverter());
-            options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-            var jsonString = JsonSerializer.Serialize(request, options);
+            var options = GetJsonOptions();
+            var jsonString = JsonSerializer.Serialize(request, GetJsonOptions());
             jsonString = jsonString.Insert(1, "\"stream\":true, "); // oh, crutch
             var contentString = new StringContent(jsonString, Encoding.UTF8, "application/json");
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, Endpoint);
@@ -110,10 +90,27 @@ namespace wtf.cluster.ChatGptLib
                 // Deserialize!
                 var result = JsonSerializer.Deserialize<ChatResponse>(line, options);
                 if (result == null)
-                    throw new InvalidDataException($"Can't parse JSON: {result}");
+                    throw new JsonException($"Can't parse JSON: {result}");
                 yield return result;
             }
             yield break;
+        }
+
+        /// <summary>
+        /// Create and return a JsonSerializerOptions object for serializing and deserializing all ChatGptLib structures.
+        /// </summary>
+        /// <returns>JsonSerializerOptions object.</returns>
+        public static JsonSerializerOptions GetJsonOptions()
+        {
+            var options = new JsonSerializerOptions
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            };
+            options.Converters.Add(new IJsonSchema.JsonSchemaConverter());
+            options.Converters.Add(new IChatContent.ChatContentConverter());
+            options.Converters.Add(new IChatContentPart.ChatContentPartConverter());
+            options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+            return options;
         }
     }
 }

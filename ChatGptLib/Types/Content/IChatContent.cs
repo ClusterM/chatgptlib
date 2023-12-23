@@ -1,3 +1,5 @@
+using System.Buffers;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -14,13 +16,19 @@ namespace wtf.cluster.ChatGptLib.Types.Content
         public class ChatContentConverter : JsonConverter<IChatContent>
         {
             /// <summary>
-            /// IChatContent objects deserializer, unused.
+            /// IChatContent objects deserializer.
             /// </summary>
-            /// <exception cref="NotImplementedException"></exception>
             public override IChatContent? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
             {
-                // API can return string only (yet?)
-                return new ChatContentText(reader.GetString() ?? String.Empty);
+                switch (reader.TokenType)
+                {
+                    case JsonTokenType.String:
+                        return new ChatContentText(reader.GetString() ?? String.Empty);
+                    case JsonTokenType.StartArray:
+                        return JsonSerializer.Deserialize<ChatContentParts>(ref reader, options);
+                    default:
+                        throw new JsonException($"Can't deserialize {typeToConvert} object");
+                }
             }
 
             /// <summary>
@@ -31,9 +39,9 @@ namespace wtf.cluster.ChatGptLib.Types.Content
                 if (value is ChatContentText v)
                     JsonSerializer.Serialize(writer, v.Text, typeof(string), options);
                 else if (value is ChatContentParts p)
-                    JsonSerializer.Serialize(writer, p.Parts, typeof(IList<IChatContentPart>), options);
+                    JsonSerializer.Serialize(writer, p, typeof(IList<IChatContentPart>), options);
                 else
-                    throw new NotFiniteNumberException($"Can't serialize {value.GetType()} object");
+                    throw new JsonException($"Can't serialize {value.GetType()} object");
             }
         }
     }

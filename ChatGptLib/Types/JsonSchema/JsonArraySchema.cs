@@ -42,5 +42,28 @@ namespace wtf.cluster.ChatGptLib.Types.JsonSchema
         /// </summary>
         [JsonPropertyName("uniqueItems")]        
         public bool? UniqueItems { get; set; }
+
+        /// <summary>
+        /// The constructor for an empty object.
+        /// </summary>
+        public JsonArraySchema() { }
+
+        /// <summary>
+        /// JsonArraySchema with the arguments.
+        /// </summary>
+        /// <param name="description">Description.</param>
+        /// <param name="items">Type of the array items as another IJsonSchema.</param>
+        /// <param name="minItems">Minimum amount of array items.</param>
+        /// <param name="maxItems">Maximum amount of array items.</param>
+        /// <param name="uniqueItems">true if every item must be unique.</param>
+        [JsonConstructor]
+        public JsonArraySchema(string? description, IJsonSchema? items, int? minItems = null, int? maxItems = null, bool? uniqueItems = null)
+        {
+            Description = description;
+            Items = items;
+            MinItems = minItems;
+            MaxItems = maxItems;
+            UniqueItems = uniqueItems;
+        }
     }
 }
