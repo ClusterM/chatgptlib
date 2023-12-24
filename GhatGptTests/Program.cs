@@ -4,6 +4,7 @@ using wtf.cluster.ChatGptLib;
 using wtf.cluster.ChatGptLib.Types;
 using wtf.cluster.ChatGptLib.Types.Content;
 using wtf.cluster.ChatGptLib.Types.JsonSchema;
+using wtf.cluster.ChatGptLib.Types.Tools;
 using static wtf.cluster.ChatGptLib.Types.ChatMessage;
 
 namespace GhatGptTests
@@ -83,7 +84,15 @@ namespace GhatGptTests
                 {
                     Model = "gpt-4-1106-preview",
                     Messages = messages,
-                    Tools = new List<ChatTool>(functions.Select(kv => new ChatTool() { Type = ChatTool.ToolType.Function, Function = new ChatFunction() { Name = kv.Key, Description = kv.Value.Description, Parameters = kv.Value.Parameters } })),
+                    Tools = new List<IChatTool>(
+                        functions.Select(kv => new ChatToolFunction(
+                            new ChatFunction() {
+                                Name = kv.Key,
+                                Description = kv.Value.Description,
+                                Parameters = kv.Value.Parameters
+                            }
+                        ))
+                    ),
                     Temperature = 0.5
                 };
                 // Create empty response
@@ -110,7 +119,7 @@ namespace GhatGptTests
                     {
                         switch (tool.Type)
                         {
-                            case ChatTool.ToolType.Function:
+                            case IChatTool.ToolType.Function:
                                 // It's function call
                                 Console.WriteLine($"Function call: {tool.Function?.Name}");
                                 if (!functions.TryGetValue(tool.Function!.Name!, out GptFunction? function))

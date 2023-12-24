@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using wtf.cluster.ChatGptLib.Types;
 using wtf.cluster.ChatGptLib.Types.Content;
 using wtf.cluster.ChatGptLib.Types.JsonSchema;
+using wtf.cluster.ChatGptLib.Types.Tools;
 
 namespace wtf.cluster.ChatGptLib
 {
@@ -104,11 +105,13 @@ namespace wtf.cluster.ChatGptLib
         {
             var options = new JsonSerializerOptions
             {
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                WriteIndented = true,
             };
             options.Converters.Add(new IJsonSchema.JsonSchemaConverter());
             options.Converters.Add(new IChatContent.ChatContentConverter());
             options.Converters.Add(new IChatContentPart.ChatContentPartConverter());
+            options.Converters.Add(new IChatTool.ChatToolConverter());
             options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
             return options;
         }

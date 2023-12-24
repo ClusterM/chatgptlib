@@ -5,15 +5,30 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace wtf.cluster.ChatGptLib.Types.Content
 {
     /// <summary>
-    /// Chat message content.
+    /// Chat message content part.
     /// </summary>
     public interface IChatContentPart
     {
         /// <summary>
+        /// Content part types.
+        /// </summary>
+        public enum ChatContentType
+        {
+            /// <summary>
+            /// Text part (ChatContentPartText)
+            /// </summary>
+            Text,
+            /// <summary>
+            /// Image URL part (ChatContentPartImageUrl)
+            /// </summary>
+            ImageUrl
+        }
+
+        /// <summary>
         /// Content part type.
         /// </summary>
         [JsonPropertyName("type")]
-        public string Type { get; }
+        public ChatContentType Type { get; }
 
         /// <summary>
         /// JSON converter for serialization and deserialization.
@@ -21,7 +36,7 @@ namespace wtf.cluster.ChatGptLib.Types.Content
         public class ChatContentPartConverter : JsonConverter<IChatContentPart>
         {
             /// <summary>
-            /// IChatContentPart objects deserializer, unused.
+            /// IChatContentPart objects deserializer.
             /// </summary>
             public override IChatContentPart? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
             {

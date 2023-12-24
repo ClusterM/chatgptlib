@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using wtf.cluster.ChatGptLib.Types.Tools;
 
 namespace wtf.cluster.ChatGptLib.Types
 {
@@ -11,20 +12,20 @@ namespace wtf.cluster.ChatGptLib.Types
         /// The ID of the tool call.
         /// </summary>
         [JsonPropertyName("id")]
-        public string Id { get; }
+        public string Id { get; init; }
 
         /// <summary>
-        /// The type of the tool. Currently, only function is supported.
-        /// Can be partial when using streaming, so do not parse it until the data has been fully received.
+        /// The type of the tool.
         /// </summary>
         [JsonPropertyName("type")]
-        public ChatTool.ToolType? Type { get; }
+        public IChatTool.ToolType? Type { get; init; }
 
         /// <summary>
         /// The function that the model called.
+        /// Can be partial when using streaming, so do not parse it until the data has been fully received.
         /// </summary>
         [JsonPropertyName("function")]
-        public ChatFunctionCallRequest? Function { get; }
+        public ChatFunctionCallRequest? Function { get; init; }
 
         /// <summary>
         /// The constructor for internal usage.
@@ -33,7 +34,7 @@ namespace wtf.cluster.ChatGptLib.Types
         /// <param name="type">The type of the tool.</param>
         /// <param name="function">The function that the model called.</param>
         [JsonConstructor]
-        public ChatToolCallRequest(string id, ChatTool.ToolType? type, ChatFunctionCallRequest? function)
+        public ChatToolCallRequest(string id, IChatTool.ToolType? type, ChatFunctionCallRequest? function)
         {
             Id = id;
             Type = type;

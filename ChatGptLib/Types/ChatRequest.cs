@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using wtf.cluster.ChatGptLib.Types.Tools;
 
 namespace wtf.cluster.ChatGptLib.Types
 {
@@ -30,7 +31,7 @@ namespace wtf.cluster.ChatGptLib.Types
         /// A list of tools the model may call. Currently, only functions are supported as a tool. Use this to provide a list of functions the model may generate JSON inputs for.
         /// </summary>
         [JsonPropertyName("tools")]
-        public IList<ChatTool>? Tools { get; set; }
+        public IList<IChatTool>? Tools { get; set; }
 
         /// <summary>
         /// What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.

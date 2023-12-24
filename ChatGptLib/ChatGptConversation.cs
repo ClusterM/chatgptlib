@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using wtf.cluster.ChatGptLib.Types;
+using wtf.cluster.ChatGptLib.Types.Tools;
 using static wtf.cluster.ChatGptLib.Types.ChatMessage;
 
 namespace wtf.cluster.ChatGptLib
@@ -76,7 +77,7 @@ namespace wtf.cluster.ChatGptLib
         /// <summary>
         /// Messages history.
         /// </summary>
-        public List<ChatMessage> Messages { get; } = new();
+        public List<ChatMessage> Messages { get; set; } = new();
 
         /// <summary>
         /// Functions list.
@@ -142,7 +143,7 @@ namespace wtf.cluster.ChatGptLib
                     Seed = Seed,
                     Messages = tmpMessages,
                     N = 1,
-                    Tools = Functions.Any() ? new List<ChatTool>(Functions.Select(kv => new ChatTool(new ChatFunction()
+                    Tools = Functions.Any() ? new List<IChatTool>(Functions.Select(kv => new ChatToolFunction(new ChatFunction()
                     {
                         Name = kv.Key,
                         Description = kv.Value.Description,
@@ -163,7 +164,7 @@ namespace wtf.cluster.ChatGptLib
                     {
                         switch (tool.Type)
                         {
-                            case ChatTool.ToolType.Function:
+                            case IChatTool.ToolType.Function:
                                 // It's a function call
                                 if (!Functions.TryGetValue(tool.Function!.Name!, out ChatFunctionMethod? function))
                                     throw new NotImplementedException($"Unknown function: {tool.Function!.Name}");
@@ -221,7 +222,7 @@ namespace wtf.cluster.ChatGptLib
                     Seed = Seed,
                     Messages = tmpMessages,
                     N = 1,
-                    Tools = new List<ChatTool>(Functions.Select(kv => new ChatTool(new ChatFunction()
+                    Tools = new List<IChatTool>(Functions.Select(kv => new ChatToolFunction(new ChatFunction()
                     {
                         Name = kv.Key,
                         Description = kv.Value.Description,
@@ -252,7 +253,7 @@ namespace wtf.cluster.ChatGptLib
                     {
                         switch (tool.Type)
                         {
-                            case ChatTool.ToolType.Function:
+                            case IChatTool.ToolType.Function:
                                 // It's a function call
                                 if (!Functions.TryGetValue(tool.Function!.Name!, out ChatFunctionMethod? function))
                                     throw new NotImplementedException($"Unknown function: {tool.Function!.Name}");
@@ -275,6 +276,27 @@ namespace wtf.cluster.ChatGptLib
                 // Until there is no tool calls
             } while (msg?.ToolCalls?.Any() == true);
             yield return String.Empty;
+        }
+        
+        /// <summary>
+        /// Save message history to the file.
+        /// </summary>
+        /// <param name="filename">Filename.</param>
+        public void SaveMessages(string filename) =>
+            File.WriteAllText(filename, JsonSerializer.Serialize(Messages, ChatGptClient.GetJsonOptions()));
+
+        /// <summary>
+        /// Load message history from the file.
+        /// </summary>
+        /// <param name="filename">Filename.</param>
+        public void LoadMessages(string filename)
+        {
+            var r = JsonSerializer.Deserialize<List<ChatMessage>>(
+                File.ReadAllText(filename), ChatGptClient.GetJsonOptions()
+            );
+            if (r == null)
+                throw new JsonException($"Can't parse {filename}");
+            Messages = r;
         }
 
         private void RemoveOldMessages()

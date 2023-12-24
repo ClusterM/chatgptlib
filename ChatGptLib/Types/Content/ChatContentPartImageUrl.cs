@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using static wtf.cluster.ChatGptLib.Types.Content.IChatContentPart;
 
 namespace wtf.cluster.ChatGptLib.Types.Content
 {
@@ -11,7 +12,7 @@ namespace wtf.cluster.ChatGptLib.Types.Content
         /// Content part type
         /// </summary>
         [JsonPropertyName("type")]
-        public string Type { get; } = "image_url";
+        public ChatContentType Type { get; } = ChatContentType.ImageUrl;
 
         /// <summary>
         /// URL to the image
