@@ -282,17 +282,17 @@ namespace wtf.cluster.ChatGptLib
         /// Save message history to the file.
         /// </summary>
         /// <param name="filename">Filename.</param>
-        public void SaveMessages(string filename) =>
-            File.WriteAllText(filename, JsonSerializer.Serialize(Messages, ChatGptClient.GetJsonOptions()));
+        public async Task SaveMessagesAsync(string filename) =>
+            await File.WriteAllTextAsync(filename, JsonSerializer.Serialize(Messages, ChatGptClient.GetJsonOptions()));
 
         /// <summary>
         /// Load message history from the file.
         /// </summary>
         /// <param name="filename">Filename.</param>
-        public void LoadMessages(string filename)
+        public async Task LoadMessagesAsync(string filename)
         {
             var r = JsonSerializer.Deserialize<List<ChatMessage>>(
-                File.ReadAllText(filename), ChatGptClient.GetJsonOptions()
+                await File.ReadAllTextAsync(filename), ChatGptClient.GetJsonOptions()
             );
             if (r == null)
                 throw new JsonException($"Can't parse {filename}");
