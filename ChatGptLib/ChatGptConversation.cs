@@ -235,12 +235,12 @@ namespace wtf.cluster.ChatGptLib
                     Seed = Seed,
                     Messages = tmpMessages,
                     N = 1,
-                    Tools = new List<IChatTool>(Functions.Select(kv => new ChatToolFunction(new ChatFunction()
+                    Tools = Functions.Any() ? new List<IChatTool>(Functions.Select(kv => new ChatToolFunction(new ChatFunction()
                     {
                         Name = kv.Key,
                         Description = kv.Value.Description,
                         Parameters = kv.Value.Parameters
-                    })))
+                    }))) : null
                 };
 
                 // Make request
