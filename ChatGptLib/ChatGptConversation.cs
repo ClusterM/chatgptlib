@@ -194,6 +194,15 @@ namespace wtf.cluster.ChatGptLib
         }
 
         /// <summary>
+        /// Get next assistant answer.
+        /// </summary>
+        /// <param name="o">Optional object to pass to a functions.</param>
+        /// <returns>Assistent answer as string.</returns>
+        public string GetAnswer(object? o = null)
+            => GetAnswerAsync(o).ConfigureAwait(false).GetAwaiter().GetResult();
+
+
+        /// <summary>
         /// Get next assistant answer as a async text stream.
         /// </summary>
         /// <param name="o">Optional object to pass to a functions.</param>
@@ -287,8 +296,15 @@ namespace wtf.cluster.ChatGptLib
         /// </summary>
         /// <param name="filename">Filename.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        public async Task SaveMessagesAsync(string filename, CancellationToken cancellationToken = default) =>
-            await File.WriteAllTextAsync(filename, JsonSerializer.Serialize(Messages, ChatGptClient.GetJsonOptions()), cancellationToken).ConfigureAwait(false);
+        public async Task SaveMessagesAsync(string filename, CancellationToken cancellationToken = default)
+            => await File.WriteAllTextAsync(filename, JsonSerializer.Serialize(Messages, ChatGptClient.GetJsonOptions()), cancellationToken).ConfigureAwait(false);
+
+        /// <summary>
+        /// Save message history to the file.
+        /// </summary>
+        /// <param name="filename">Filename.</param>
+        public void SaveMessages(string filename)
+            => SaveMessagesAsync(filename).ConfigureAwait(false).GetAwaiter().GetResult();
 
         /// <summary>
         /// Load message history from the file.
@@ -304,6 +320,13 @@ namespace wtf.cluster.ChatGptLib
                 throw new JsonException($"Can't parse {filename}");
             Messages = r;
         }
+
+        /// <summary>
+        /// Load message history from the file.
+        /// </summary>
+        /// <param name="filename">Filename.</param>
+        public void LoadMessages(string filename)
+            => LoadMessagesAsync(filename).ConfigureAwait(false).GetAwaiter().GetResult();
 
         private void RemoveOldMessages()
         {

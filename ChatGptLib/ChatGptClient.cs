@@ -58,6 +58,14 @@ namespace wtf.cluster.ChatGptLib
         }
 
         /// <summary>
+        /// The request to the OpenAI API (non-streaming)
+        /// </summary>
+        /// <param name="request">The ChatRequest object describing request data</param>
+        /// <returns>The response from the OpenAI API as ChatResponse object</returns>
+        public ChatResponse Request(ChatRequest request)
+            => RequestAsync(request).ConfigureAwait(false).GetAwaiter().GetResult();
+
+        /// <summary>
         /// The steaming request to the OpenAI API.
         /// </summary>
         /// <param name="request">The ChatRequest object describing request data.</param>
