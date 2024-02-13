@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using System.Runtime.CompilerServices;
+using System.Text.Json;
+using System.Threading;
 using wtf.cluster.ChatGptLib.Types;
 using wtf.cluster.ChatGptLib.Types.Tools;
 using static wtf.cluster.ChatGptLib.Types.ChatMessage;
@@ -116,8 +118,9 @@ namespace wtf.cluster.ChatGptLib
         /// Get next assistant answer.
         /// </summary>
         /// <param name="o">Optional object to pass to a functions.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Assistent answer as string.</returns>
-        public async Task<string> GetAnswerAsync(object? o = null)
+        public async Task<string> GetAnswerAsync(object? o = null, CancellationToken cancellationToken = default)
         {
             ChatMessage? msg = null;
             RemoveOldMessages();
@@ -152,7 +155,7 @@ namespace wtf.cluster.ChatGptLib
                 };
 
                 // Make request
-                var completionResult = await gpt.RequestAsync(request);
+                var completionResult = await gpt.RequestAsync(request, cancellationToken).ConfigureAwait(false);
                 msg = completionResult.Choices.First().Message!;
                 // Add message to the history
                 newMessages.Add(msg);
@@ -170,7 +173,7 @@ namespace wtf.cluster.ChatGptLib
                                     throw new NotImplementedException($"Unknown function: {tool.Function!.Name}");
                                 // Call the function
                                 var argsDoc = JsonDocument.Parse(tool.Function!.Arguments!);
-                                var functionResult = await function!.Function(argsDoc.RootElement, o);
+                                var functionResult = await function!.Function(argsDoc.RootElement, o, cancellationToken).ConfigureAwait(false);
                                 // Need to add function result to the chat history
                                 var functionResultMessage = new ChatMessage(ChatMessageRole.Tool, functionResult, tool.Function?.Name)
                                 {
@@ -194,8 +197,9 @@ namespace wtf.cluster.ChatGptLib
         /// Get next assistant answer as a async text stream.
         /// </summary>
         /// <param name="o">Optional object to pass to a functions.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Assistent answer as string (parts).</returns>
-        public async IAsyncEnumerable<string> GetAnswerStreamAsync(object? o = null)
+        public async IAsyncEnumerable<string> GetAnswerStreamAsync(object? o = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             ChatMessage? msg = null;
 
@@ -232,7 +236,7 @@ namespace wtf.cluster.ChatGptLib
 
                 // Make request
                 var completionResult = new ChatResponse();
-                var completionResultStream = gpt.RequestStreamAsync(request);
+                var completionResultStream = gpt.RequestStreamAsync(request, cancellationToken).ConfigureAwait(false);
                 await foreach (var p in completionResultStream)
                 {
                     completionResult = completionResult! + p;
@@ -259,7 +263,7 @@ namespace wtf.cluster.ChatGptLib
                                     throw new NotImplementedException($"Unknown function: {tool.Function!.Name}");
                                 // Call the function
                                 var argsDoc = JsonDocument.Parse(tool.Function!.Arguments!);
-                                var functionResult = await function!.Function(argsDoc.RootElement, o);
+                                var functionResult = await function!.Function(argsDoc.RootElement, o, cancellationToken).ConfigureAwait(false);
                                 // Need to add function result to the chat history
                                 var functionResultMessage = new ChatMessage(ChatMessageRole.Tool, functionResult, tool.Function?.Name)
                                 {
@@ -277,22 +281,24 @@ namespace wtf.cluster.ChatGptLib
             } while (msg?.ToolCalls?.Any() == true);
             yield return String.Empty;
         }
-        
+
         /// <summary>
         /// Save message history to the file.
         /// </summary>
         /// <param name="filename">Filename.</param>
-        public async Task SaveMessagesAsync(string filename) =>
-            await File.WriteAllTextAsync(filename, JsonSerializer.Serialize(Messages, ChatGptClient.GetJsonOptions()));
+        /// <param name="cancellationToken">Cancellation token.</param>
+        public async Task SaveMessagesAsync(string filename, CancellationToken cancellationToken = default) =>
+            await File.WriteAllTextAsync(filename, JsonSerializer.Serialize(Messages, ChatGptClient.GetJsonOptions()), cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Load message history from the file.
         /// </summary>
         /// <param name="filename">Filename.</param>
-        public async Task LoadMessagesAsync(string filename)
+        /// <param name="cancellationToken">Cancellation token.</param>
+        public async Task LoadMessagesAsync(string filename, CancellationToken cancellationToken = default)
         {
             var r = JsonSerializer.Deserialize<List<ChatMessage>>(
-                await File.ReadAllTextAsync(filename), ChatGptClient.GetJsonOptions()
+                await File.ReadAllTextAsync(filename, cancellationToken).ConfigureAwait(false), ChatGptClient.GetJsonOptions()
             );
             if (r == null)
                 throw new JsonException($"Can't parse {filename}");

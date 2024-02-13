@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -31,8 +32,9 @@ namespace wtf.cluster.ChatGptLib
         /// The request to the OpenAI API (non-streaming)
         /// </summary>
         /// <param name="request">The ChatRequest object describing request data</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>The response from the OpenAI API as ChatResponse object</returns>
-        public async Task<ChatResponse> RequestAsync(ChatRequest request)
+        public async Task<ChatResponse> RequestAsync(ChatRequest request, CancellationToken cancellationToken = default)
         {
             var options = GetJsonOptions();
             var jsonString = JsonSerializer.Serialize(request, options);
@@ -40,8 +42,8 @@ namespace wtf.cluster.ChatGptLib
             var contentString = new StringContent(jsonString, Encoding.UTF8, "application/json");
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, Endpoint);
             requestMessage.Content = contentString;
-            using var response = await client.SendAsync(requestMessage);
-            var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            using var response = await client.SendAsync(requestMessage, cancellationToken).ConfigureAwait(false);
+            var responseString = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             // Error check
             var errorContainer = JsonSerializer.Deserialize<ChatGptErrorContainer>(responseString);
             if (errorContainer?.Error != null)
@@ -59,8 +61,9 @@ namespace wtf.cluster.ChatGptLib
         /// The steaming request to the OpenAI API.
         /// </summary>
         /// <param name="request">The ChatRequest object describing request data.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>The response from the OpenAI API as a ChatResponse enumerator with partial data chunks.</returns>
-        public async IAsyncEnumerable<ChatResponse> RequestStreamAsync(ChatRequest request)
+        public async IAsyncEnumerable<ChatResponse> RequestStreamAsync(ChatRequest request, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             var options = GetJsonOptions();
             var jsonString = JsonSerializer.Serialize(request, GetJsonOptions());
@@ -68,18 +71,18 @@ namespace wtf.cluster.ChatGptLib
             var contentString = new StringContent(jsonString, Encoding.UTF8, "application/json");
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, Endpoint);
             requestMessage.Content = contentString;
-            using var response = await client.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead);
-            using var stream = await response.Content.ReadAsStreamAsync();
+            using var response = await client.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             using StreamReader reader = new StreamReader(stream);
             string? line;
-            while ((line = await reader.ReadLineAsync().ConfigureAwait(false)) != null)
+            while ((line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false)) != null)
             {
                 if (string.IsNullOrWhiteSpace(line))
                     continue;
                 if (line.StartsWith("data: "))
                     line = line[6..].Trim();
                 else // in case of error we need to read it to the end
-                    line += await reader.ReadToEndAsync();
+                    line += await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
                 if (line == "[DONE]")
                     break;
                 // Error check
