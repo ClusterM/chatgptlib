@@ -45,9 +45,16 @@ namespace wtf.cluster.ChatGptLib
             using var response = await client.SendAsync(requestMessage, cancellationToken).ConfigureAwait(false);
             var responseString = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             // Error check
-            var errorContainer = JsonSerializer.Deserialize<ChatGptErrorContainer>(responseString);
-            if (errorContainer?.Error != null)
-                throw new ChatGptException(errorContainer.Error);
+            try
+            {
+                var errorContainer = JsonSerializer.Deserialize<ChatGptErrorContainer>(responseString);
+                if (errorContainer?.Error != null)
+                    throw new ChatGptException(errorContainer.Error);
+            }
+            catch (JsonException)
+            {
+                throw new InvalidDataException($"Can't parse JSON: {responseString}");
+            }
             if (!response.IsSuccessStatusCode)
                 throw new HttpRequestException(responseString, inner: null, statusCode: response.StatusCode);
             // Deserialize!
@@ -94,9 +101,16 @@ namespace wtf.cluster.ChatGptLib
                 if (line == "[DONE]")
                     break;
                 // Error check
-                var errorContainer = JsonSerializer.Deserialize<ChatGptErrorContainer>(line);
-                if (errorContainer?.Error != null)
-                    throw new ChatGptException(errorContainer.Error);
+                try
+                {
+                    var errorContainer = JsonSerializer.Deserialize<ChatGptErrorContainer>(line);
+                    if (errorContainer?.Error != null)
+                        throw new ChatGptException(errorContainer.Error);
+                }
+                catch (JsonException)
+                {
+                    throw new InvalidDataException($"Can't parse JSON: {line}");
+                }
                 if (!response.IsSuccessStatusCode)
                     throw new HttpRequestException(line, inner: null, statusCode: response.StatusCode);
                 // Deserialize!
@@ -126,5 +140,6 @@ namespace wtf.cluster.ChatGptLib
             options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
             return options;
         }
+
     }
 }

@@ -26,10 +26,10 @@ namespace wtf.cluster.ChatGptLib.Types
         public string? Param { get; init; }
 
         /// <summary>
-        /// The code of the error.
+        /// The code of the error. Can be string or int.
         /// </summary>
         [JsonPropertyName("code")]
-        public string? Code { get; init; }
+        public object? Code { get; init; }
 
         /// <summary>
         /// The constructor for internal usage.
@@ -39,7 +39,7 @@ namespace wtf.cluster.ChatGptLib.Types
         /// <param name="param">The rrror parameter.</param>
         /// <param name="code">The code of the error.</param>
         [JsonConstructor]
-        public ChatError(string? message, string? type, string? param, string? code)
+        public ChatError(string? message, string? type, string? param, object? code)
         {
             Message = message;
             Type = type;
