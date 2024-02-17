@@ -1,6 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text.Json;
-using System.Threading;
 using wtf.cluster.ChatGptLib.Types;
 using wtf.cluster.ChatGptLib.Types.Tools;
 using static wtf.cluster.ChatGptLib.Types.ChatMessage;
@@ -86,7 +85,7 @@ namespace wtf.cluster.ChatGptLib
         /// </summary>
         public Dictionary<string, ChatFunctionMethod> Functions { get; set; } = new();
 
-        private readonly ChatGptClient gpt;
+        private ChatGptClient gpt;
 
 
         /// <summary>
@@ -99,6 +98,12 @@ namespace wtf.cluster.ChatGptLib
             Model = model;
             gpt = new ChatGptClient(apiKey);
         }
+
+        /// <summary>
+        /// Change API key.
+        /// </summary>
+        /// <param name="apiKey">OpenAI API key.</param>
+        public void SetApiKey(string apiKey) => gpt = new ChatGptClient(apiKey);
 
         /// <summary>
         /// Add text message from user.
@@ -189,7 +194,7 @@ namespace wtf.cluster.ChatGptLib
                 Messages.AddRange(newMessages);
                 // Until there is no tool calls
             } while (msg?.ToolCalls?.Any() == true);
-            
+
             return $"{msg?.Content}";
         }
 
@@ -200,7 +205,6 @@ namespace wtf.cluster.ChatGptLib
         /// <returns>Assistent answer as string.</returns>
         public string GetAnswer(object? o = null)
             => GetAnswerAsync(o).ConfigureAwait(false).GetAwaiter().GetResult();
-
 
         /// <summary>
         /// Get next assistant answer as a async text stream.

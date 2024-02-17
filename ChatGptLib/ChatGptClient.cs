@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
@@ -27,6 +28,12 @@ namespace wtf.cluster.ChatGptLib
             client = new();
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
         }
+
+        /// <summary>
+        /// Change API key.
+        /// </summary>
+        /// <param name="apiKey">OpenAI API key.</param>
+        public void SetApiKey(string apiKey) => client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
 
         /// <summary>
         /// The request to the OpenAI API (non-streaming)

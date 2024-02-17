@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Net.Http.Headers;
 using System.Text.Json;
-using System.Threading.Tasks;
 using wtf.cluster.ChatGptLib.Types;
 
 namespace wtf.cluster.ChatGptLib
@@ -39,8 +35,14 @@ namespace wtf.cluster.ChatGptLib
         public WhisperClient(string apiKey)
         {
             client = new();
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
         }
+
+        /// <summary>
+        /// Change API key.
+        /// </summary>
+        /// <param name="apiKey">OpenAI API key.</param>
+        public void SetApiKey(string apiKey) => client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
 
         /// <summary>
         /// Transcribes audio data asynchronously.
